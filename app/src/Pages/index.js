@@ -1,120 +1,30 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, {Component} from 'react';
-import { Table, Input, InputNumber, Popconfirm, Form, Spin, Button} from 'antd';
+import { Table, Popconfirm, Form, Spin, Button} from 'antd';
 import 'antd/dist/antd.css';
-// import CollectionCreateForm from '../Components/Create/Create'
-// import Search from '../Search/Search'
-// import Myinput from '../Components/Input/Input'
-import Myinput from '../Components/Input/Input'
+import Myinput from '../Components/Input/Input';
 import { Route, Switch,} from 'react-router-dom';
-// import store from '../store'
-// import {
-//   createFetchAction,
-//   createDeleteAction,
-//   createSearchAction,
-//   createResetAction,
-//   createAction,
-//   createSavesAction,
-//   createEditAction,
-//   cancelAction
-// } from '../Actions/todoList'
-import {connect} from 'react-redux'
+import {connect} from 'react-redux';
+import EditableCell from '../Components/Modify ';
 
-// const data = null;
+
+
+export  const EditableContext = React.createContext();
 
 let mapStateToProps = (state) =>{
   return {
     todoListReducer: state.todoListReducer
   }
 }
-// let mapDispatchToPropst = (dispatch)=>{
-//   return {
-//     fetch:(res)=>{
-//       dispatch(createFetchAction(res))
-//     },
-//     delete: (id) => {
-//       dispatch(createDeleteAction(id));
-//     },
-//     searcha: (value) => {
-//       dispatch(createSearchAction(value));
-//     },
-//     reset: () => {
-//       dispatch(createResetAction());
-//     },
-//     create: (values) => {
-//       dispatch(createAction(values));
-//     },
-//     saves: (values) => {
-//       dispatch(createSavesAction(values));
-//     },
-//     edit: (id) => {
-//       dispatch(createEditAction(id));
-//     },
-//     cancel: () => {
-//       dispatch( cancelAction());
-//     },
-//   }
-// }
-
-const EditableContext = React.createContext();
-
-//修改类
-class EditableCell extends React.Component {
-    getInput = () => {
-      if (this.props.inputType === 'number') {
-        return <InputNumber />;
-      }
-      return <Input />;
-    };
-  
-    renderCell = ({ getFieldDecorator }) => {
-      const {
-        editing,
-        dataIndex,
-        title,
-        inputType,
-        record,
-        index,
-        children,
-        ...restProps
-      } = this.props;
-      return (
-        <td {...restProps}>
-          {editing ? (
-            <Form.Item style={{ margin: 0 }}>
-              {getFieldDecorator(dataIndex, {
-                rules: [
-                  {
-                    required: true,
-                    message: `Please Input ${title}!`,
-                  },
-                ],
-                initialValue: record[dataIndex],
-              })(this.getInput())}
-            </Form.Item>
-          ) : (
-            children
-          )}
-        </td>
-      );
-    };
-  
-    render() {
-
-      return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
-    }
-}
 @connect(mapStateToProps)
 class EditableTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      // data: store.getState().todoListReducer.data,
       editingKey: '',
       visible: false, 
       loading: false,
     };
-    // store.subscribe(this.listening)
+    
     const {todoListReducer:{data}} =this.props;
     this.columns = [
       {
@@ -180,25 +90,25 @@ class EditableTable extends React.Component {
       },
     ];
 
-    this.isEditing = this.isEditing.bind(this)
-    this.handReset = this.handReset.bind(this)
-    this.save = this.save.bind(this)
-    // this.handleCreate = this.handleCreate.bind(this)
-    this.handSearch = this.handSearch.bind(this)
-    this.edits = this.edits.bind(this)
-    this.handleDelete = this.handleDelete.bind(this)
+    // this.isEditing = this.isEditing.bind(this)
+    // this.handReset = this.handReset.bind(this)
+    // this.save = this.save.bind(this)
+    // this.handSearch = this.handSearch.bind(this)
+    // this.edits = this.edits.bind(this)
+    // this.handleDelete = this.handleDelete.bind(this)
     
   }
 
   isEditing = record => record.id === this.state.editingKey;
 
+  //修改取消方法
   cancels = () => {
     // this.props.cancel()
     this.setState({ editingKey: '' });
   };
 
-  //修改
-  save(form, id) {
+  //修改保存方法
+  save=(form, id)=> {
     const {todoListReducer:{data}} =this.props;
     form.validateFields((error, row) => {
       if (error) {
@@ -223,7 +133,8 @@ class EditableTable extends React.Component {
     });
   }
 
-  edits(id) {
+  //修改方法
+  edits=(id)=> {
     this.setState({ editingKey: id });
   }
 
@@ -232,41 +143,13 @@ class EditableTable extends React.Component {
     this.props.dispatch({type:'de',id})
   }
 
-  //添加方法
-  // handleCancel = () => {
-  //   this.setState({ visible: false });
-  // };
-  // handleCreate = () => {
-  //   const { form } = this.formRef.props;
-  //   form.validateFields((err, values) => {
-  //     if (err) {
-  //       return;
-  //     }
- 
-  //     form.resetFields();
-
-  //     this.setState({ visible: false });
-  //     this.props.dispatch({type:'in',values})
-  //   });
-  // };
-
-  // showModal = () => {
-  //   this.setState({ visible: true });
-  // };
-
-  // saveFormRef = formRef => {
-  //   this.formRef = formRef;
-  // };
-
-
-
   //搜索方法
-  handSearch(value){ 
+  handSearch=(value)=>{ 
     this.props.dispatch({type:'mo',value})
   }
 
   //重置方法
-  handReset(){
+  handReset=()=>{
     this.props.dispatch({type:'re'})
   }
 
@@ -276,7 +159,9 @@ class EditableTable extends React.Component {
   }
 
   render() {
+
     const {todoListReducer:{data}} =this.props;
+
     const components = {
       body: {
         cell: EditableCell,
@@ -298,24 +183,13 @@ class EditableTable extends React.Component {
         }),
       };
     });
+
     return (
       <div>
         { data
           ?<div>
-              
               <Myinput handSearch={this.handSearch} style={{marginLeft:0}} handReset={this.handReset}></Myinput>
-              {/* <Button type="primary" onClick={this.showModal} style={{marginLeft:10}}>
-                创建
-              </Button> */}
-              <Switch>
-                  <Route path="/" component={tiao}></Route>
-              </Switch>
-              {/* <CollectionCreateForm
-                wrappedComponentRef={this.saveFormRef}
-                visible={this.state.visible}
-                onCancel={this.handleCancel}
-                onCreate={this.handleCreate}
-              /> */}
+              <Switch><Route path="/" component={tiao}></Route></Switch>
               <EditableContext.Provider value={this.props.form}>
                 <Table
                   components={components}
@@ -332,14 +206,11 @@ class EditableTable extends React.Component {
             </div>
           : <Spin style={{marginLeft:'900px',marginTop:'200px'}} tip="加载中..." size='large'/>
         }
-      </div>
-      
+      </div> 
     );
   }
 }
-
 const EditableFormTable = Form.create()(EditableTable);
-
 
 //添加创建组件
 const tiao= function(props){
@@ -348,12 +219,12 @@ const tiao= function(props){
   }
 
   return (
-    <Button type="primary" size='large' onClick={click} style={{marginTop:20}}>创建</Button>
+    <Button type="primary" size='large' onClick={click} style={{marginTop:20, marginBottom:10}}>创建</Button>
   )
 }
 
-
 class Mytable extends Component{ 
+
     render(){
         return <EditableFormTable />
     }

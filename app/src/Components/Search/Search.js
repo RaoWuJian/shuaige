@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import { Form, Row, Col, Input, Button, Icon, Radio } from 'antd';
 import 'antd/dist/antd.css';
@@ -72,13 +73,6 @@ class AdvancedSearchForm extends React.Component {
 }
 
 const WrappedAdvancedSearchForm = Form.create({ name: 'advanced_search' })(AdvancedSearchForm);
-// ReactDOM.render(
-//   <div>
-//     <WrappedAdvancedSearchForm />
-//     <div className="search-result-list">Search Result List</div>
-//   </div>,
-//   mountNode,
-// );
 
 class Mysearch extends React.Component{
     render(){

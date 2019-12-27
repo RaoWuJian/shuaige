@@ -1,8 +1,43 @@
 import React,{Component} from 'react';
+import { Button, Modal, Form, Input, Radio } from 'antd';
 import {connect} from 'react-redux'
-import { Input,Button, Modal } from 'antd';
-const { TextArea } = Input;
-const { confirm } = Modal;
+
+const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
+  class extends React.Component {
+    render() {
+      const { visible, onCancel, onCreate, form } = this.props;
+      const { getFieldDecorator } = form;
+      return (
+        <Modal
+          visible={visible}
+          title="创建"
+          okText="创建"
+          cancelText='取消'
+          onCancel={onCancel}
+          onOk={onCreate}
+        >
+          <Form layout="vertical">
+            <Form.Item label="名称">
+              {getFieldDecorator('name', {
+                rules: [{ required: true, message: '输入名称' }],
+              })(<Input />)}
+            </Form.Item>
+            <Form.Item label="类型">
+              {getFieldDecorator('type',  {
+                rules: [{ required: true, message: '输入类型' }],
+              })(<Input type="textarea" />)}
+            </Form.Item>
+            <Form.Item label="内容">
+              {getFieldDecorator('content', {
+                rules: [{ required: true, message: '输入内容' }],
+              })(<Input type="textarea" />)}
+            </Form.Item>
+          </Form>
+        </Modal>
+      );
+    }
+  },
+);
 
 
 let mapStateToProps = (state) =>{
@@ -12,75 +47,51 @@ let mapStateToProps = (state) =>{
 }
 
 @connect(mapStateToProps)
-class MyInfo extends Component{
-  constructor(props) {
-    super(props);
-    this.state={
-      name: '',
-      type: '',
-      content: '',
-    }
+class MyInfo extends React.Component {
+  state = {
+    visible: true,
+  };
 
-    this.setUsername = this.setUsername.bind(this)
-    this.setUsertype = this.setUsertype.bind(this)
-    this.setUsercontent = this.setUsercontent.bind(this)
-    this.click = this.click.bind(this)
-    this.cancel = this.cancel.bind(this)
-    this.showConfirm = this.showConfirm.bind(this)
-  }
+  showModal = () => {
+    this.setState({ visible: true });
+  };
 
-  setUsername(e){
-    this.setState({name:e})
-  }
-
-  setUsertype(e){
-    this.setState({type:e})
-  }
-  setUsercontent(e){
-    this.setState({content:e})
-  }
-
-  showConfirm() {
-    confirm({
-      title: '警告！！！',
-      content: '内容不能为空',
-      onCancel() {},
-    });
-  }
-  click(){
-    console.log(this.props)
-    let {name,type,content} = this.state;
-    let value = {
-      name,
-      type,
-      content
-    }
-    if(value.name && value.type && value.content){
-      this.props.dispatch({type:'in',value});
-      this.props.history.replace('/');
-    }else{
-      this.showConfirm()
-    }
-  }
-
-
-
-  cancel(){
+  handleCancel = () => {
     this.props.history.replace('/');
-  }
+
+  };
+
+  handleCreate = () => {
+    const { form } = this.formRef.props;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+
+      this.props.dispatch({type:'in',values});
+      this.props.history.replace('/');
+      form.resetFields();
+      
+    });
+  };
+
+  saveFormRef = formRef => {
+    this.formRef = formRef;
+  };
+
   render() {
     return (
       <div>
-        <form>
-          <Input placeholder="用户名" onChange={(e) => {this.setUsername(e.target.value)}} type="text" style={{marginTop:50, marginLeft: 700, width:400, height:40}}/><br/>        
-          <Input placeholder="类型"   onChange={(e) => {this.setUsertype(e.target.value)}} type="text" style={{marginTop:10, marginLeft: 700, width:400, height:40}}/><br/> 
-          <TextArea  rows={4}  defaultValue="" placeholder="评价"   onChange={(e) => {this.setUsercontent(e.target.value)}} type="text" style={{marginTop:10, marginLeft: 700, width:400,}}/><br/>
-          <Button type="danger" style={{marginLeft: 700, width:200}} onClick={this.cancel} >取消</Button>
-          <Button type="primary" style={{marginLeft: 0, width:200}} onClick={this.click} >提交</Button>
-        </form>
+        <CollectionCreateForm
+          wrappedComponentRef={this.saveFormRef}
+          visible={this.state.visible}
+          onCancel={this.handleCancel}
+          onCreate={this.handleCreate}
+        />
       </div>
     );
   }
 }
+
 
 export default MyInfo;

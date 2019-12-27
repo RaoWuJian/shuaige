@@ -11,8 +11,7 @@ let connection = mysql.createConnection({
 
 connection.connect();
 
-
-//请求头
+//Header
 app.all('*', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -21,7 +20,6 @@ app.all('*', function(req, res, next) {
     res.header("Content-Type", "application/json;charset=utf-8");
     next();
 });
-
 
 //查询
 app.get('/',function (req,res) {
